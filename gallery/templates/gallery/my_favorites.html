@@ -2,8 +2,8 @@
 {% block content %}
 <div class="container mt-4">
   <div class="d-flex justify-content-between mb-3">
-    <h2>Gallery</h2>
-    <a class="btn btn-primary" href="{% url 'image-upload' %}">Upload Image</a>
+    <h2>My Favorite Images</h2>
+    <a class="btn btn-secondary" href="{% url 'news-feed' %}">← Back to News Feed</a>
   </div>
 
   <div class="row">
@@ -11,7 +11,7 @@
     <div class="col-md-4 mb-4">
       <div class="card h-100">
         <div class="card-header">
-          <strong>{{ image.uploaded_by.username }}</strong>
+          <strong>Uploaded by: {{ image.uploaded_by.username }}</strong>
         </div>
         <a href="{% url 'image-detail' image.pk %}">
           <img src="{{ image.image.url }}" class="card-img-top object-fit-cover" style="height: 250px; width: 100%;" alt="{{ image.title }}">
@@ -22,22 +22,14 @@
 
           <form action="{% url 'toggle-like' image.pk %}" method="post" class="d-inline">
             {% csrf_token %}
-            {% if user in image.liked_by.all %}
-              <button type="submit" class="btn btn-sm btn-outline-danger">❤️ Unlike</button>
-            {% else %}
-              <button type="submit" class="btn btn-sm btn-outline-primary">🤍 Like</button>
-            {% endif %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">💔 Remove Favorite</button>
             <span class="ms-2">{{ image.liked_by.count }} likes</span>
           </form>
-
-          {% if image.uploaded_by == user %}
-            <a href="{% url 'image-delete' image.pk %}" class="btn btn-sm btn-danger float-end">Delete</a>
-          {% endif %}
         </div>
       </div>
     </div>
     {% empty %}
-    <p>No images uploaded yet.</p>
+    <p>You haven't liked any images yet.</p>
     {% endfor %}
   </div>
 </div>
