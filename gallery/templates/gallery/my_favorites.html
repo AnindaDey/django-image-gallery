@@ -14,7 +14,11 @@
           <strong>Uploaded by: {{ image.uploaded_by.username }}</strong>
         </div>
         <a href="{% url 'image-detail' image.pk %}">
-          <img src="{{ image.image.url }}" class="card-img-top object-fit-cover" style="height: 250px; width: 100%;" alt="{{ image.title }}">
+            <div class="card h-100" style="min-height: 500px;">
+
+                <img src="{{ image.image.url }}" class="w-100 h-100" style="object-fit: contain;" alt="{{ image.title }}">
+              </div>
+              
         </a>
         <div class="card-body">
           <h5 class="card-title">{{ image.title }}</h5>

@@ -2,16 +2,39 @@
 {% block content %}
 <div class="container mt-4">
 
-  <!-- Full-width image section -->
-  <div class="mb-4">
-    <img src="{{ image.image.url }}" class="img-fluid w-100 rounded" alt="{{ image.title }}" style="max-height: 80vh; object-fit: cover;">
+  <!-- Full-width image section with zoom on click -->
+  <div class="mb-4 shadow-lg rounded overflow-hidden">
+    <a href="{{ image.image.url }}" target="_blank">
+      <img src="{{ image.image.url }}" 
+      class="img-fluid w-100" 
+      alt="{{ image.title }}" 
+      style="max-height: 80vh; object-fit: contain;">
+ 
+    </a>
   </div>
 
+  <!-- Image details -->
   <div class="card mb-4">
     <div class="card-body">
       <h2 class="card-title">{{ image.title }}</h2>
       <p class="card-text">{{ image.description }}</p>
       <p class="text-muted">Uploaded by: {{ image.uploaded_by.username }}</p>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+          <form action="{% url 'toggle-like' image.pk %}" method="post" class="d-inline">
+            {% csrf_token %}
+            {% if user in image.liked_by.all %}
+              <button type="submit" class="btn btn-sm btn-outline-danger">❤️ Unlike</button>
+            {% else %}
+              <button type="submit" class="btn btn-sm btn-outline-primary">🤍 Like</button>
+            {% endif %}
+          </form>
+          <span class="ms-2">{{ image.liked_by.count }} likes</span>
+        </div>
+
+       
+      </div>
     </div>
   </div>
 
@@ -29,6 +52,7 @@
     {% endfor %}
   </div>
 
+  <!-- Comment form -->
   {% if user.is_authenticated %}
   <form method="post">
     {% csrf_token %}
@@ -38,5 +62,6 @@
   {% else %}
     <p><a href="{% url 'login' %}">Login</a> to add a comment.</p>
   {% endif %}
+
 </div>
 {% endblock %}
