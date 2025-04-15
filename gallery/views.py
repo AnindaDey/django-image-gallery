@@ -9,6 +9,12 @@ class GalleryListView(LoginRequiredMixin, ListView):
     template_name = 'gallery/gallery_list.html'
     context_object_name = 'images'
 
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return self.model.objects.all()
+        return self.model.objects.filter(uploaded_by=self.request.user)
+
+
 class ImageUploadView(LoginRequiredMixin, CreateView):
     model = Image
     form_class = ImageForm
