@@ -9,7 +9,14 @@ from django.views.generic import DetailView
 from django.shortcuts import redirect
 from .models import Image, Comment
 from .forms import CommentForm
-
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from .forms import CustomUserCreationForm
+from .models import UserProfile
+from django.db import transaction
+from django.views.generic import TemplateView
 
 class GalleryListView(LoginRequiredMixin, ListView):
     model = Image
@@ -78,15 +85,6 @@ class NewsFeedView(ListView):
         return Image.objects.exclude(uploaded_by=self.request.user).order_by('-uploaded_at')
 
 
-# gallery/views.py
-class ProfileView(LoginRequiredMixin, ListView):
-    model = Image
-    template_name = 'gallery/profile.html'
-    context_object_name = 'images'
-
-    def get_queryset(self):
-        return Image.objects.filter(uploaded_by=self.request.user).order_by('-uploaded_at')
-
 
 
 class ImageDetailView(DetailView):
@@ -111,3 +109,58 @@ class ImageDetailView(DetailView):
         context = self.get_context_data()
         context['form'] = form
         return self.render_to_response(context)
+
+
+
+
+
+
+
+class CustomSignupView(CreateView):
+    form_class = CustomUserCreationForm
+    template_name = 'gallery/signup.html'
+    success_url = reverse_lazy('login')
+
+    @transaction.atomic
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = self.object
+        name = form.cleaned_data.get('name')
+        dob = form.cleaned_data.get('dob')
+        picture = form.cleaned_data.get('picture')
+
+        UserProfile.objects.create(
+            user=user,
+            name=name,
+            dob=dob,
+            picture=picture
+        )
+        return response
+
+
+
+
+
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import UserProfile, Image
+
+class MyProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'gallery/my_profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        # fetch the profile
+        try:
+            profile = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            profile = None
+        context['profile'] = profile
+
+        # fetch the user’s own images
+        context['images'] = Image.objects.filter(uploaded_by=user).order_by('-uploaded_at')
+
+        return context
+

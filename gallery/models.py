@@ -30,3 +30,15 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author.username} - {self.text[:20]}"
+
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    dob = models.DateField(null=True, blank=True)
+    picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
+

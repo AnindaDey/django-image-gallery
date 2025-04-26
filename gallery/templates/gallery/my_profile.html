@@ -1,0 +1,49 @@
+{% extends 'gallery/base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>My Profile</h2>
+
+  {% if profile %}
+    <div class="card p-3 shadow-sm rounded mb-5" style="max-width: 500px;">
+      {% if profile.picture %}
+      <img src="{{ profile.picture.url }}" class="img-fluid rounded-circle mb-3" style="width: 150px;" alt="Profile Picture">
+      {% else %}
+      <p>No profile picture uploaded.</p>
+      {% endif %}
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Name:</strong> {{ profile.name }}</li>
+        <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+        <li class="list-group-item"><strong>Date of Birth:</strong> {{ profile.dob }}</li>
+      </ul>
+    </div>
+  {% else %}
+    <p>User profile not found.</p>
+  {% endif %}
+
+  <!-- ↓ Your Uploaded Images ↓ -->
+  <h3>My Uploaded Images</h3>
+  <div class="row">
+    {% for image in images %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <strong>{{ user.username }}</strong>
+          </div>
+          <a href="{% url 'image-detail' image.pk %}">
+            <img src="{{ image.image.url }}" class="img-fluid" alt="{{ image.title }}">
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">{{ image.title }}</h5>
+            <p class="card-text">{{ image.description }}</p>
+            <a href="{% url 'image-delete' image.pk %}" class="btn btn-sm btn-danger">Delete</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">You haven't uploaded any images yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
